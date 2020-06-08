@@ -9,7 +9,9 @@ Order-Coffee - Director for the Builder,
 Database - Class for connecting to database,
 DBCoffee - class that extend Database and some functionality,
 СoffeeGUI - class that uses all files above,
-Machine - class that run the code
+Machine - class that runs the code.
+
+
 Steps to run our code:
 1. Create database called coffee_bar and use sql file from repository.
 2. Add module .jar file to your project structure.
