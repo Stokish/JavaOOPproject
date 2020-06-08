@@ -2,8 +2,8 @@
 Coffee Bar APP!
 We created Coffee Bar app for our endterm project. We used Builder Creational pattern and Swift library.
 Here is what is what:
-Coffee - Main product class
-CoffeeMaker - Interface for Builder
+Coffee - Main product class,
+CoffeeMaker - Interface for Builder,
 Barista - Builder,
 Order-Coffee - Director for the Builder,
 Database - Class for connecting to database,
