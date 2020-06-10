@@ -21,9 +21,9 @@ public class CoffeeGUI extends JFrame {
     //Check1 Check2 Check3 for choosing coffee
     private final JButton button = new JButton("Order!");
     private final JLabel label = new JLabel("Choose:");
-    private final JCheckBox check1 ;
-    private final JCheckBox check2 ;
-    private final JCheckBox check3 ;
+    private JCheckBox check1 ;
+    private JCheckBox check2 ;
+    private JCheckBox check3 ;
 
     //Int this inputs we write  how many cup of each coffee we want
     private final JFormattedTextField input1 = new JFormattedTextField();
@@ -43,7 +43,7 @@ public class CoffeeGUI extends JFrame {
         try {
             database = new DBCoffee("jdbc:mysql://localhost:3306/coffee_bar?autoReconnect=true&useSSL=false", "root", "idealcode");
         } catch (SQLException | ClassNotFoundException exception) {
-            exception.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Something went wrong, try run app later", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
 
@@ -52,27 +52,27 @@ public class CoffeeGUI extends JFrame {
         // get cost for Americano from database
         try {
             cost = database.getCost(1);
+            check1 = new JCheckBox("Americano $" + cost);
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Something went wrong, try run app later", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        check1 = new JCheckBox("Americano $" + cost);
 
         // get cost for Latte from database
         try {
             cost = database.getCost(2);
+            check2 = new JCheckBox("Latte  $" + cost);
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Something went wrong, try run app later", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        check2 = new JCheckBox("Latte  $" + cost);
 
 
         // get cost for Cappuccino from database
         try {
             cost = database.getCost(3);
+            check3 = new JCheckBox("Cappuccino  $" + cost);
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Something went wrong, try run app later", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        check3 = new JCheckBox("Cappuccino  $" + cost);
 
 
         //making open a windows in the middle
@@ -97,7 +97,7 @@ public class CoffeeGUI extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 char c = e.getKeyChar();
-                if(!Character.isDigit(c) ) {
+                if(Character.isLetter(c)) {
                     label1.setText("Invalid Input");
                 } else {
                     label1.setText(" ");
@@ -116,7 +116,7 @@ public class CoffeeGUI extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 char c = e.getKeyChar();
-                if(!Character.isDigit(c)) {
+                if(Character.isLetter(c)) {
                     label2.setText("Invalid Input");
                 } else {
                     label2.setText("");
@@ -135,7 +135,7 @@ public class CoffeeGUI extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 char c = e.getKeyChar();
-                if(!Character.isDigit(c)) {
+                if(Character.isLetter(c)) {
                     label3.setText("Invalid Input");
                 } else {
                     label3.setText("");
@@ -161,6 +161,8 @@ public class CoffeeGUI extends JFrame {
             Barista barista = new Barista();
             ArrayList<Coffee> coffee = new ArrayList<Coffee>();
 
+            //String for error
+            String err = " ";
             //i is used to upload new purchases to database
             //cost just calculates overall cost of an order
             int i =0;
@@ -171,12 +173,16 @@ public class CoffeeGUI extends JFrame {
                 order.MakeAmericano(barista);
                 coffee.add(barista.getResult());
                 try {
-                    i = database.getPurchased(1) + Integer.parseInt(input1.getText());
-                    cost += database.getCost(1)  * Double.parseDouble(input1.getText());
-                    database.setNewPurchase(i, 1);
-                    k1 = database.getPurchased(1);
-                } catch (SQLException exception) {
-                    exception.printStackTrace();
+                    if(Integer.parseInt(input1.getText()) > 0) {
+                        i = database.getPurchased(1) + Integer.parseInt(input1.getText());
+                        cost += database.getCost(1) * Double.parseDouble(input1.getText());
+                        database.setNewPurchase(i, 1);
+                        k1 = database.getPurchased(1);
+                    } else {
+                        err = "You have ordered with invalid input, please write positive integer number";
+                    }
+                } catch (SQLException | NumberFormatException exception) {
+                    err = "You have ordered with invalid input, please write positive integer number";
                 }
             }
 
@@ -185,13 +191,16 @@ public class CoffeeGUI extends JFrame {
                 order.MakeLatte(barista);
                 coffee.add(barista.getResult());
                 try {
-                    i = database.getPurchased(2) + Integer.parseInt(input2.getText());
-                    cost += database.getCost(2)  * Double.parseDouble(input2.getText());
-                    database.setNewPurchase(i, 2);
-                    k2 =database.getPurchased(2);
-
-                } catch (SQLException exception) {
-                    exception.printStackTrace();
+                    if(Integer.parseInt(input2.getText()) > 0) {
+                        i = database.getPurchased(2) + Integer.parseInt(input2.getText());
+                        cost += database.getCost(2) * Double.parseDouble(input2.getText());
+                        database.setNewPurchase(i, 2);
+                        k2 = database.getPurchased(2);
+                    } else {
+                        err = "You have ordered with invalid input, please write positive integer number";
+                    }
+                } catch (SQLException | NumberFormatException exception) {
+                    err = "You have ordered with invalid input, please write positive integer number";
                 }
             }
 
@@ -200,33 +209,39 @@ public class CoffeeGUI extends JFrame {
                 order.MakeCappuccino(barista);
                 coffee.add(barista.getResult());
                 try {
-                    i = database.getPurchased(3) + Integer.parseInt(input3.getText());
-                    cost += database.getCost(3)  * Double.parseDouble(input3.getText());
-                    database.setNewPurchase(i, 3);
-                    k3 =database.getPurchased(3);
-                } catch (SQLException exception) {
-                    exception.printStackTrace();
+                    if(Integer.parseInt(input3.getText()) > 0) {
+                        i = database.getPurchased(3) + Integer.parseInt(input3.getText());
+                        cost += database.getCost(3)  * Double.parseDouble(input3.getText());
+                        database.setNewPurchase(i, 3);
+                        k3 =database.getPurchased(3);
+                    } else {
+                        err = "You have ordered with invalid input, please write positive integer number";
+                    }
+                } catch (SQLException | NumberFormatException exception) {
+                    err = "You have ordered with invalid input, please write positive integer number";
                 }
             }
+            if(err.equals(" ")) {
 
-            message.append(check1.isSelected() ? " You ordered " + input1.getText() + " Americano(Overall in our coffee bar it was purchased " + k1 + " times)\n\n" : "");
-            message.append(check2.isSelected() ? " You ordered " + input2.getText() + " Latte(Overall in our coffee bar it was purchased " + k2 + " times)\n\n" : "");
-            message.append(check3.isSelected() ? " You ordered " + input3.getText() + " Cappuccino(Overall in our coffee bar it was purchased " + k3 + " times)\n\n" : "");
+                message.append(check1.isSelected() ? " You ordered " + input1.getText() + " Americano(Overall in our coffee bar it was purchased " + k1 + " times)\n\n" : "");
+                message.append(check2.isSelected() ? " You ordered " + input2.getText() + " Latte(Overall in our coffee bar it was purchased " + k2 + " times)\n\n" : "");
+                message.append(check3.isSelected() ? " You ordered " + input3.getText() + " Cappuccino(Overall in our coffee bar it was purchased " + k3 + " times)\n\n" : "");
 
-            for(Coffee c : coffee){
-                message.append(c.toString()).append("\n\n");
+                for (Coffee c : coffee) {
+                    message.append(c.toString()).append("\n\n");
+                }
+                // to round a "cost" variable
+                DecimalFormat df = new DecimalFormat("#.##");
+                df.setRoundingMode(RoundingMode.CEILING);
+
+
+                message.append((check1.isSelected() || check2.isSelected() || check3.isSelected()) ? "\nCost: $" : "You didn't ordered anything, pick checkboxes ");
+                message.append((check1.isSelected() || check2.isSelected() || check3.isSelected()) ? df.format(cost) : " ");
+
+                JOptionPane.showMessageDialog(null, message.toString(), "Your order", JOptionPane.PLAIN_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, err, "Error", JOptionPane.ERROR_MESSAGE);
             }
-            // to round a "cost" variable
-            DecimalFormat df = new DecimalFormat("#.##");
-            df.setRoundingMode(RoundingMode.CEILING);
-
-
-            message.append((check1.isSelected() || check2.isSelected() || check3.isSelected())?"\nCost: $": "You didn't ordered anything ");
-            message.append((check1.isSelected() || check2.isSelected() || check3.isSelected())? df.format(cost) : " ");
-
-            JOptionPane.showMessageDialog(null, message.toString(), "Your order", JOptionPane.PLAIN_MESSAGE);
         }
     }
 }
-
-
